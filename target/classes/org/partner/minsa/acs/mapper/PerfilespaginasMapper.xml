@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.partner.minsa.acs.mapper.PerfilespaginasMapper">
+ <resultMap id="rmPerfilespaginas" type="org.partner.minsa.acs.domain.Perfilespaginas">
+        <result property="idperfilespaginas"   column="idperfilespaginas" />
+        <result property="idperfil"   column="idperfil" />
+        <result property="idpagina"   column="idpagina" />
+        <result property="estado"   column="estado" />
+<association property="pagina" javaType="org.partner.minsa.acs.domain.Pagina" column="idpagina" resultMap="rmPagina"/>
+    <association property="perfiles" javaType="org.partner.minsa.acs.domain.Perfiles" column="idperfil" resultMap="rmPerfiles"/>
+        </resultMap>
+ <resultMap id="rmPagina" type="org.partner.minsa.acs.domain.Pagina">
+        <result property="idpagina"   column="idpagina" />
+        <result property="idmodulo"   column="idmodulo" />
+        <result property="descripcion"   column="descripcion" />
+        <result property="url"   column="url" />
+        <result property="parametros"   column="parametros" />
+        <result property="icono"   column="icono" />
+        <result property="estado"   column="estado" />
+        <result property="orden"   column="orden" />
+<association property="modulo" javaType="org.partner.minsa.acs.domain.Modulo" column="idmodulo" resultMap="rmModulo"/>
+        </resultMap> <resultMap id="rmModulo" type="org.partner.minsa.acs.domain.Modulo">
+        <result property="idmodulo"   column="idmodulo" />
+        <result property="descripcion"   column="descripcion" />
+        <result property="icono"   column="icono" />
+        <result property="estado"   column="estado" />
+        <result property="raiz"   column="raiz" />
+    </resultMap> <resultMap id="rmPerfiles" type="org.partner.minsa.acs.domain.Perfiles">
+        <result property="idperfiles"   column="idperfiles" />
+        <result property="nombres"   column="nombres" />
+        <result property="ambito"   column="ambito" />
+        <result property="estado"   column="estado" />
+    </resultMap>
+<resultMap id="rmTotal" type="org.partner.minsa.acs.domain.Pagination">
+        <result property="cantidad"   column="cantidad" />
+    </resultMap><select id="retornaCantidadList"  resultMap="rmTotal">
+        select count(*) as cantidad from perfilespaginas o 
+        <if test="perfilespaginas.estado != null and perfilespaginas.estado != '' and perfilespaginas.estado ==1">           
+            where o.estado =1
+        </if>
+        <if test="perfilespaginas.estado != null and perfilespaginas.estado != '' and perfilespaginas.estado ==2">           
+            where o.estado =0
+        </if>      
+    </select>
+ <select id="retornaPerfilespaginasPorEstado"  resultMap="rmPerfilespaginas">
+        select idperfilespaginas,idperfil,idpagina,estado from perfilespaginas
+        <if test="perfilespaginas.estado != null and perfilespaginas.estado != '' and perfilespaginas.estado ==1">           
+             where estado =1
+        </if>
+        <if test="perfilespaginas.estado != null and perfilespaginas.estado != '' and perfilespaginas.estado ==2">           
+             where estado =0
+        </if>
+  <if test="perfilespaginas.offset != null and perfilespaginas.limit != null">           
+            offset #{perfilespaginas.offset} limit #{perfilespaginas.limit}
+        </if>
+    </select>
+ <select id="retornaPerfilespaginasLikePorNombre"  resultMap="rmPerfilespaginas">
+        
+select idperfilespaginas,idperfil,idpagina,estado from perfilespaginas where nombre like concat('%',#{perfilespaginas.nombre},'%')    
+</select>
+</mapper>

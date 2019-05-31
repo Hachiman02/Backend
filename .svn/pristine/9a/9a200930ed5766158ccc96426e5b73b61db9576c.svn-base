@@ -1,0 +1,49 @@
+package org.partner.minsa.acs.service.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+
+import org.partner.minsa.acs.domain.Ingreso;
+
+import org.partner.minsa.acs.mapper.IngresoMapper;
+import org.partner.minsa.acs.service.IngresoService;
+import org.springframework.stereotype.Service;
+@Service("marcaService")
+public class IngresoServiceImpl implements IngresoService {
+	@Resource(name = "ingresoMapper")
+	IngresoMapper ingresoMapper;
+
+	@Override
+	public List<Ingreso> lsGuias(Ingreso ingreso) {
+		List<Ingreso> lsIngreso = new ArrayList<Ingreso>();
+		try{
+			lsIngreso = ingresoMapper.lsGuias(ingreso);
+		}
+		catch(Exception e){
+			System.out.println(this.getClass().getSimpleName() + "lsguias" + "Linea nro : "+e.getStackTrace()[0].getLineNumber());
+        	System.out.println("ERROR: "+e.getMessage());
+		}
+		finally{
+		return lsIngreso;
+		}
+	}
+	 
+	 public List<Ingreso> agrupaProductos(Integer[] ls_id_ingreso){
+		List<Ingreso> lsMarca = new ArrayList<Ingreso>();
+		try{
+			
+		lsMarca = ingresoMapper.lsguias(ingreso);
+		}
+		catch(Exception e){
+			System.out.println(this.getClass().getSimpleName() + "lsguias" + "Linea nro : "+e.getStackTrace()[0].getLineNumber());
+        	System.out.println("ERROR: "+e.getMessage());
+		}
+		finally{
+		return lsMarca;
+		}
+	}
+
+}

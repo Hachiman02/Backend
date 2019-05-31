@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.partner.minsa.acs.mapper.ParametrosMapper">
+     <resultMap id="rmParametros" type="org.partner.minsa.acs.domain.Parametros">
+        <result property="idparametros"   column="idparametros" />
+        <result property="descripcion"   column="descripcion" />
+        <result property="codigo"   column="codigo" />
+        <result property="valor"   column="valor" />
+        <result property="grupo"   column="grupo" />
+        <result property="nombre"   column="nombre" />
+        <result property="estado"   column="estado" />
+          </resultMap>
+    <resultMap id="rmTotal" type="org.partner.minsa.acs.domain.Pagination">
+        <result property="cantidad"   column="cantidad" />
+    </resultMap>
+    <select id="retornaParametrosPorEstado"  resultMap="rmParametros">
+        select idparametros,grupo,nombre,descripcion,codigo,valor,estado from parametros 
+        <if test="parametros.estado != null  and parametros.estado ==1">           
+            and  estado =1
+        </if>
+        <if test="parametros.estado != null  and parametros.estado ==2">           
+            and  estado =0
+        </if>
+        <if test="parametros.offset != null and parametros.limit != null">           
+            offset #{parametros.offset} limit #{parametros.limit}
+        </if>
+    </select>
+       <select id="retornaParametrosPorEstadoCorreos"  resultMap="rmParametros">
+        select idparametros,grupo,nombre,descripcion,codigo,valor,estado from parametros where grupo=#{parametros.grupo}
+        <if test="parametros.estado != null  and parametros.estado ==1">           
+            and  estado =1
+        </if>
+        <if test="parametros.estado != null  and parametros.estado ==2">           
+            and  estado =0
+        </if>
+        <if test="parametros.offset != null and parametros.limit != null">           
+            offset #{parametros.offset} limit #{parametros.limit}
+        </if>
+    </select>
+    <select id="retornaParametrosLikePorNombre"  resultMap="rmParametros">
+        select idparametros,descripcion,grupo,nombre,codigo,valor,estado from parametros where upper(descripcion) like upper(concat('%',#{parametros.descripcion},'%'))    
+        <if test="parametros.offset != null and parametros.limit != null">           
+            offset #{parametros.offset} limit #{parametros.limit}
+        </if>
+    </select>
+    <select id="retornaCantidadList"  resultMap="rmTotal">
+        select count(*) as cantidad from parametros  where
+        <if test="parametros.estado != null  and parametros.estado ==1">           
+              estado =1
+        </if>
+        <if test="parametros.estado != null  and parametros.estado ==2">           
+              estado =0
+        </if>       
+    </select>
+    <select id="retornaCantidadListCorrep"  resultMap="rmTotal">
+        select count(*) as cantidad from parametros where grupo=#{parametros.grupo}
+        <if test="parametros.estado != null  and parametros.estado ==1">           
+            and estado =1
+        </if>
+        <if test="parametros.estado != null  and parametros.estado ==2">           
+            and estado =0
+        </if>       
+    </select>
+</mapper>

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.partner.minsa.acs.mapper.UserMapper">
+	<resultMap id="rmUsers"
+		type="org.partner.minsa.acs.domain.User">
+		<result property="username" column="username" />
+		<result property="role" column="role" />
+		<result property="email" column="email" />
+		<result property="name" column="name" />
+		<result property="password" column="password" />
+		<result property="id" column="id" />
+		<result property="ambito" column="ambito" />
+		<result property="estado" column="estado" />
+		<result property="idred" column="idred" />
+		<result property="departamento" column="departamento" />
+	</resultMap>
+	<resultMap id="rmModulo"
+		type="org.partner.minsa.acs.domain.Modulo">
+		<result property="idmodulo" column="idmodulo" />
+		<result property="descripcion" column="descripcionM" />
+		<result property="icono" column="iconoM" />
+		<result property="estado" column="estadoM" />
+		<result property="raiz" column="raiz" />
+		<collection property="lsPaginas" javaType="ArrayList"
+			ofType="org.partner.minsa.acs.domain.Pagina" column="idmodulo"
+			resultMap="rmPagina" />
+	</resultMap>
+	<resultMap id="rmPagina"
+		type="org.partner.minsa.acs.domain.Pagina">
+		<result property="idpagina" column="idpagina" />
+		<result property="idmodulo" column="idmodulo" />
+		<result property="descripcion" column="descripcionP" />
+		<result property="url" column="url" />
+		<result property="icono" column="iconoP" />
+		<result property="parametros" column="parametros" />
+		<result property="estado" column="estadoP" />
+	</resultMap>
+	<resultMap id="rmTotal"
+		type="org.partner.minsa.acs.domain.Pagination">
+		<result property="cantidad" column="cantidad" />
+	</resultMap>
+
+   <select id="loginUser" parameterType="org.partner.minsa.acs.mapper.UserMapper" resultMap="rmUsers">
+         
+        select e.id,e.email,e.estado,e.username,e.role,e.password,e.ambito,e.idred,e.departamento
+          from users e 
+         where upper(e.username)=upper(#{username}) and e.password=#{password}       
+    </select>
+ 
+
+	<select id="retornaObjUsers" resultMap="rmUsers">
+		select
+		username,role,email,name,id,idred,ambito,departamento,estado from
+		users
+		where id=#{users.id}
+	</select>
+	<select id="retornaCantidadList" resultMap="rmTotal">
+		select count(*) as cantidad from users o
+		<if
+			test="users.estado != null and users.estado != '' and users.estado ==1">
+			where o.estado =1
+		</if>
+		<if
+			test="users.estado != null and users.estado != '' and users.estado ==2">
+			where o.estado =0
+		</if>
+	</select>
+	<select id="retornaUserPorEstado" resultMap="rmUsers">
+		select username,role,email,name,id,idred,ambito,departamento,estado
+		from users
+		<if
+			test="users.estado != null and users.estado != '' and users.estado ==1">
+			where estado =1
+		</if>
+		<if
+			test="users.estado != null and users.estado != '' and users.estado ==2">
+			where estado =0
+		</if>
+		<if test="users.offset != null and users.limit != null">
+			offset #{users.offset} limit #{users.limit}
+		</if>
+	</select>
+	
+		<select id="retornaUserUserName" resultMap="rmUsers">
+		select username,id 
+		from users where estado =1
+ 		</select>
+	
+	
+	<select id="retornaUserLikePorNombre" resultMap="rmUsers">
+
+		select
+		username,role,email,name,id,idred,ambito,departamento,estado from
+		users where nombre like
+		concat('%',#{users.nombre},'%')
+	</select>
+
+	<select id="retornaAccesosGestor"
+		parameterType="org.partner.minsa.acs.domain.User" resultMap="rmModulo">
+
+		SELECT
+		m.idmodulo , m.descripcion as descripcionM,m.raiz , m.icono as
+		iconoM,
+		m.estado as estadoM,
+		pa.idpagina, pa.descripcion as descripcionP,
+		pa.url, pa.parametros, pa.icono as
+		iconoP, pa.estado as estadoP
+		FROM
+		userperfiles gp left join perfilespaginas p on
+		p.idperfil=gp.idperfiles
+		left join pagina pa on pa.idpagina=p.idpagina
+		and pa.estado='1'
+		left join modulo m on m.idmodulo=pa.idmodulo
+		left join users u on u.id=gp.idusuario
+		where
+		u.username=#{username} and gp.estado=1 group by m.idmodulo ,pa.idpagina order by
+		m.idmodulo,pa.idpagina asc;
+
+	</select>
+
+</mapper>

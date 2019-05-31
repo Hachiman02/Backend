@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.partner.minsa.acs.mapper.PerfilesMapper">
+	<resultMap id="rmPerfiles"
+		type="org.partner.minsa.acs.domain.Perfiles">
+		<result property="idperfiles" column="idperfiles" />
+		<result property="nombres" column="nombres" />
+		<result property="ambito" column="ambito" />
+		<result property="estado" column="estadop" />
+		<result property="estado_pag" column="estadopag"/>
+	</resultMap>
+
+	<resultMap id="rmTotal"
+		type="org.partner.minsa.acs.domain.Pagination">
+		<result property="cantidad" column="cantidad" />
+	</resultMap>
+	<resultMap id="rmPaginaPerfil"
+		type="org.partner.minsa.acs.domain.Pagina">
+		<result property="idpagina" column="idpagina" />
+		<result property="idmodulo" column="idmodulo" />
+		<result property="descripcion" column="descripcionp" />
+		<result property="nameModulo" column="descripcionm" />
+		<result property="url" column="url" />
+		<result property="parametros" column="parametros" />
+		<result property="icono" column="iconop" />
+		<result property="siperfil" column="estado" />
+		<result property="idperfil" column="idperfil" />
+		<result property="estado" column="estado"/>
+		<association property="modulo"
+			javaType="org.partner.minsa.acs.domain.Modulo" column="idmodulo"
+			resultMap="rmModulo" />
+	</resultMap>
+	<resultMap id="rmModulo"
+		type="org.partner.minsa.acs.domain.Modulo">
+		<result property="idmodulo" column="idmodulom" />
+		<result property="descripcion" column="descripcionm" />
+		<result property="icono" column="iconom" />
+		<result property="estado" column="estadom" />
+	</resultMap>
+	<select id="retornaCantidadList" resultMap="rmTotal">
+		select count(*) as cantidad from perfiles o
+		<if
+			test="perfiles.estado != null and perfiles.estado != '' and perfiles.estado ==1">
+			where o.estado =1
+		</if>
+		<if
+			test="perfiles.estado != null and perfiles.estado != '' and perfiles.estado ==2">
+			where o.estado =0
+		</if>
+	</select>
+	<select id="retornaPerfilesPorEstado" resultMap="rmPerfiles">
+		select idperfiles,nombres,ambito,estado from perfiles
+		<if
+			test="perfiles.estado != null and perfiles.estado != '' and perfiles.estado ==1">
+			where estado =1
+		</if>
+		<if
+			test="perfiles.estado != null and perfiles.estado != '' and perfiles.estado ==2">
+			where estado =0
+		</if>
+		<if test="perfiles.offset != null and perfiles.limit != null">
+			offset #{perfiles.offset} limit #{perfiles.limit}
+		</if>
+	</select>
+	<select id="retornaPerfilesLikePorNombre" resultMap="rmPerfiles">
+
+		select
+		idperfiles,nombres,ambito,estado from perfiles where nombre like
+		concat('%',#{perfiles.nombre},'%')
+	</select>
+	<select id="retornaPaginasMapPorPerfil"
+		parameterType="org.partner.minsa.acs.domain.Perfiles"
+		resultMap="rmPaginaPerfil">
+        <![CDATA[
+  		select *,0 as estado,#{idperfiles} as idperfil from view_paginasperfiles o where  o.idpagina not in(
+		select uo.idpagina from perfilespaginas uo where uo.idperfil=#{idperfiles}
+		)
+		union
+		select *,1 as estado,#{idperfiles} as idperfil from view_paginasperfiles o where  o.idpagina in(
+		select uo.idpagina from perfilespaginas uo where uo.idperfil=#{idperfiles}
+		)
+		]]>
+	</select>
+	
+	<select id="retornaPaginasPrueba" resultMap="rmPaginaPerfil">
+       select 
+       p.idperfiles,p.nombres,p.ambito,p.estado as estadop,p.idmodulo,pa.estado as estadopag
+       from perfiles p
+       inner join perfilespaginas pp on pp.idperfi=p.idperfiles
+       inner join pagina pag on pag.idpagina=pp.idpagina
+       where idperfiles=#{perfilss.idperfiles}
+   	</select>
+	
+	
+	
+</mapper>

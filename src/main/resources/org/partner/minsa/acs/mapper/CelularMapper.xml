@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.partner.minsa.acs.mapper.CelularMapper">
+
+
+	<resultMap id="rmCelular" type="org.partner.minsa.acs.domain.Celular">
+		<result property="imei" column="imei" />
+		<result property="precio" column="precioc" />
+		<result property="color" column="color" />
+		<result property="numero" column="numero" />
+		<result property="fecha_compra" column="fecha_compra" />
+
+		<association property="modelo"
+			javaType="org.partner.minsa.acs.domain.Modelo" column="id" resultMap="rmModelo" />
+	</resultMap>
+
+
+
+	<resultMap id="rmModelo" type="org.partner.minsa.acs.domain.Modelo">
+		<result property="id" column="ido" />
+		<result property="nombre" column="nombmo" />
+		<result property="precio" column="preciom" />
+		<result property="fecha_fabricacion" column="fecha_fabricacion" />
+
+		<association property="marca" javaType="org.partner.minsa.acs.domain.Marca"
+			column="id" resultMap="rmMarca" />
+	</resultMap>
+	<resultMap id="rmMarca" type="org.partner.minsa.acs.domain.Marca">
+		<result property="id" column="ida" />
+		<result property="nombre" column="nombma" />
+		<result property="pais_fabricante" column="pais_fabricante" />
+		<result property="fecha_fundacion" column="fecha_fundacion" />
+		<result property="limite_compra" column="limite_compra" />
+	</resultMap>
+
+	<select id="retornaModeloma" resultMap="rmCelular">
+		select c.imei ,mo.id as ido ,ma.id as ida,mo.nombre as nombmo,ma.nombre as nombma,c.precio as precioc,c.color,c.numero,c.fecha_compra
+		from modelo mo join marca ma on mo.idmarca=ma.id 
+                       join celular c on c.idmodelo=mo.id
+
+	</select>
+
+
+
+
+</mapper>

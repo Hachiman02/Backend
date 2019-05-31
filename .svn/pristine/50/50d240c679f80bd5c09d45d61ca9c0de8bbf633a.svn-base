@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.partner.minsa.acs.mapper.UserperfilesMapper">
+ <resultMap id="rmUserperfiles" type="org.partner.minsa.acs.domain.Userperfiles">
+        <result property="iduserperfiles"   column="iduserperfiles" />
+        <result property="idperfiles"   column="idperfiles" />
+        <result property="idusuario"   column="idusuario" />
+        <result property="estado"   column="estado" />
+<association property="perfiles" javaType="org.partner.minsa.acs.domain.Perfiles" column="idperfiles" resultMap="rmPerfiles"/>
+        </resultMap>
+ <resultMap id="rmPerfiles" type="org.partner.minsa.acs.domain.Perfiles">
+        <result property="idperfiles"   column="idperfiles" />
+        <result property="nombres"   column="nombres" />
+        <result property="ambito"   column="ambito" />
+        <result property="estado"   column="estado" />
+    </resultMap>
+<resultMap id="rmTotal" type="org.partner.minsa.acs.domain.Pagination">
+        <result property="cantidad"   column="cantidad" />
+    </resultMap><select id="retornaCantidadList"  resultMap="rmTotal">
+        select count(*) as cantidad from userperfiles o 
+        <if test="userperfiles.estado != null and userperfiles.estado != '' and userperfiles.estado ==1">           
+            where o.estado =1
+        </if>
+        <if test="userperfiles.estado != null and userperfiles.estado != '' and userperfiles.estado ==2">           
+            where o.estado =0
+        </if>      
+    </select>
+ <select id="retornaUserperfilesPorEstado"  resultMap="rmUserperfiles">
+        select iduserperfiles,idperfiles,idusuario,estado from userperfiles
+        <if test="userperfiles.estado != null and userperfiles.estado != '' and userperfiles.estado ==1">           
+             where estado =1
+        </if>
+        <if test="userperfiles.estado != null and userperfiles.estado != '' and userperfiles.estado ==2">           
+             where estado =0
+        </if>
+  <if test="userperfiles.offset != null and userperfiles.limit != null">           
+            offset #{userperfiles.offset} limit #{userperfiles.limit}
+        </if>
+    </select>
+ <select id="retornaUserperfilesLikePorNombre"  resultMap="rmUserperfiles">
+        
+select iduserperfiles,idperfiles,idusuario,estado from userperfiles where nombre like concat('%',#{userperfiles.nombre},'%')    
+</select>
+</mapper>

@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Implementation-Title: zigap
+Implementation-Version: 0.0.1-SNAPSHOT
+Built-By: PT018
+Implementation-Vendor-Id: org.partner
+Build-Jdk: 1.8.0_201
+Implementation-URL: http://projects.spring.io/spring-boot/backZigap/
+Created-By: Maven Integration for Eclipse
+Implementation-Vendor: Pivotal Software, Inc.
+
