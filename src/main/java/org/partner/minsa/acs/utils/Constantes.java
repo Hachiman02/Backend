@@ -67,4 +67,12 @@ public class Constantes {
    public static final String msgNoGuiasRegistros = "No hay guias registradas ";
     
     
+   public static final String ipbasedatos = "67.205.143.180";
+   public static final String puertobasedatos = "5432";
+   public static final String nombrebasedatos = "tcs2";
+   public static final String usuariobasedatos = "modulo4";
+   public static final String contraseñabasedatos = "modulo4";
+
+   
+ 	 
 }

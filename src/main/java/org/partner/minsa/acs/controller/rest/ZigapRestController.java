@@ -12,6 +12,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.partner.minsa.acs.domain.Alumno;
 import org.partner.minsa.acs.domain.Alumno_programa;
 import org.partner.minsa.acs.domain.Marca;
 import org.partner.minsa.acs.domain.ResponseWrapper;
@@ -162,7 +163,7 @@ public class ZigapRestController {
 	}
 	
 	@RequestMapping(value = "/lsprograma", method = RequestMethod.POST)
-	public ResponseWrapper lsprograma(@RequestBody @Validated Alumno_programa alumno_programa, HttpServletRequest request)
+	public ResponseWrapper lsprograma(@RequestBody @Validated Alumno alumno, HttpServletRequest request)
 			throws Exception {
 		HttpSession session = request.getSession();
 		List objtList = new ArrayList();
@@ -170,14 +171,27 @@ public class ZigapRestController {
 		ResponseWrapper obj = new ResponseWrapper();
 	 	try {
 	 			try {
-		 			String url = "jdbc:postgresql://67.205.143.180:5432/tcs2";
-					String user="modulo4";
-					String password="modulo4";
-					Integer limite_inferior=1, limite_superior=20;
+	 				String url = "jdbc:postgresql://"
+	 						+Constantes.ipbasedatos
+	 						+":"
+	 						+Constantes.puertobasedatos
+	 						+"/"
+	 						+Constantes.nombrebasedatos;
+
+			//	String user="modulo4";
+				String user=Constantes.usuariobasedatos;
+
+				//String password="modulo4";
+				String password=Constantes.contraseñabasedatos;
 					Connection con =DriverManager.getConnection(url,user,password);
 					Statement st = (Statement) con.createStatement();
 				try{
-					 ResultSet rs = st.executeQuery("select * from programa");
+					ResultSet rs = st.executeQuery("select pro.*  "
+								+ "from programa pro "
+								+ "inner join alumno_programa alu_pro on alu_pro.id_programa=pro.id_programa "
+								+ "inner join alumno_alumno_programa alu_alu_pro on alu_alu_pro.cod_alumno=alu_pro.cod_alumno "
+								+ "where "
+								+ " alu_alu_pro.id_alum="+alumno.getId_alumno() +" ;");
 				 		objtList=resultSetToArrayList(rs);
 			 	}catch(Exception e ){
 					System.out.println("Excepcion "+ e.getMessage());	
@@ -218,6 +232,101 @@ public class ZigapRestController {
 
 	        for(int i=1; i<=columns; i++){
 	          row.put(md.getColumnName(i),rs.getObject(i));
+	        }
+	    }
+	    return results;
+	}
+	
+	@RequestMapping(value = "/loginAlumno", method = RequestMethod.POST)
+	public ResponseWrapper loginAlumno(@RequestBody @Validated Alumno alumno, HttpServletRequest request)
+			throws Exception {
+		HttpSession session = request.getSession();
+		List objtList = new ArrayList();
+		List objtListprograma = new ArrayList();
+ 		List<Alumno> lsalu = new ArrayList();
+		ResponseWrapper obj = new ResponseWrapper();
+		Connection con = null;
+	 	try {
+	 			try {
+		 		//	String url = "jdbc:postgresql://67.205.143.180:5432/tcs2";
+		 			String url = "jdbc:postgresql://"
+		 						+Constantes.ipbasedatos
+		 						+":"
+		 						+Constantes.puertobasedatos
+		 						+"/"
+		 						+Constantes.nombrebasedatos;
+
+				//	String user="modulo4";
+					String user=Constantes.usuariobasedatos;
+
+					//String password="modulo4";
+					String password=Constantes.contraseñabasedatos;
+
+					
+					Integer limite_inferior=1, limite_superior=20;
+					  con =DriverManager.getConnection(url,user,password);
+					Statement st = (Statement) con.createStatement();
+				try{
+					 ResultSet rs  = st.executeQuery("select alu.*   "
+								+ "from alumno_encuesta alu "
+ 								+ "where "
+ 					 			+ "  alu.dni ='"+alumno.getDni_m()+"'"+" ;");
+							/* 	+ "  alu.dni = '"+alumno.getDni_m()+"'"
+					 			+ " and alu.ape_paterno ="+alumno.getApe_paterno()+""+" ;");
+					  */
+					  objtList=resultSetToArrayList(rs);  
+
+					 ResultSet rsprogrma = st.executeQuery("select pro.*  "
+								+ "from programa pro "
+								+ "inner join alumno_programa alu_pro on alu_pro.id_programa=pro.id_programa "
+								+ "inner join alumno_alumno_programa alu_alu_pro on alu_alu_pro.cod_alumno=alu_pro.cod_alumno "
+								+ "inner join alumno_encuesta alu_encuesta on alu_encuesta.id_alum=alu_alu_pro.id_alum "
+								+ "where "
+								+ "  alu_encuesta.dni ='"+alumno.getDni_m()+"'"+" ;");
+					 objtListprograma=resultSetToArrayList(rsprogrma);  
+
+					 
+ 				  
+			 	}catch(Exception e ){
+					System.out.println("Excepcion "+ e.getMessage());	
+					}
+			  		if (objtList != null && objtList.size() > 0) {
+						obj.setMsg(Constantes.msgTransaccionOk);   
+						obj.setEstado(Constantes.valTransaccionOk);
+						obj.setAaData(objtList);
+						obj.setLsprograma(objtListprograma);
+ 					} else {
+						obj.setMsg(Constantes.msgTransaccionFiltroNoEncontrada);
+						obj.setEstado(Constantes.valTransaccionNoEncontro);
+						obj.setAaData(objtList);
+						obj.setLsprograma(objtListprograma);					}
+				} catch (Exception e) {
+					 
+					obj.setEstado(Constantes.valTransaccionErrornull);
+					obj.setAaData(objtList);
+					obj.setLsprograma(objtListprograma);		
+				}
+	 	} catch (Exception e) {
+			obj.setMsg(Constantes.msgTransaccionErrorNull);
+			obj.setEstado(Constantes.valTransaccionErrornull);
+			obj.setAaData(objtList);
+ 		} finally {
+ 			con.close();
+			return obj;
+		}
+
+	}
+	
+	public ArrayList resultSetToArrayListAlumno(ResultSet rs) throws SQLException{
+	    ResultSetMetaData md = rs.getMetaData();
+	    int columns = md.getColumnCount();
+	    ArrayList results = new ArrayList();
+ 	    while (rs.next()) {
+	        HashMap row = new HashMap();
+	        results.add(row);    
+	        for(int i=1; i<=columns; i++){
+	          row.put(md.getColumnName(i),rs.getObject(i));
+	         md.getColumnDisplaySize(0);
 	        }
 	    }
 	    return results;

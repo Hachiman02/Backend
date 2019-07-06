@@ -21,6 +21,7 @@ public class ResponseWrapper {
 
 	Object defaultObj;
 	List<Object> aaData;
+	List<Object> lsprograma;
 
 	private Integer estado;
 	private String msg;
@@ -80,6 +81,14 @@ public class ResponseWrapper {
  	 * 
  	 */
 	private String idempresa;
+	public List<Object> getLsprograma() {
+		return lsprograma;
+	}
+
+	public void setLsprograma(List<Object> lsprograma) {
+		this.lsprograma = lsprograma;
+	}
+
 	private String idalmacen;
 	private String periodo_mes;
 	private String periodo_año;
